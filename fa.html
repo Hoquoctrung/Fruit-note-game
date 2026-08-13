@@ -584,6 +584,7 @@ button{
 }
 
 @media(max-width:430px){
+  html,body{overflow-x:hidden;}
   .game{padding:11px 8px 17px;}
   .fruits{font-size:27px;}
   .title{font-size:27px;}
@@ -813,7 +814,6 @@ function getCurrentNotes(){
 
 }
 
-async 
 let audioCtx = null;
 
 async function initAudio(){
@@ -1030,13 +1030,7 @@ function nextQuestion(){
     levels[currentLevel].choices
   );
 
-  choicesEl.style.setProperty(
-    "--choice-count",
-    levels[currentLevel].choices
-  );
-
   choicesEl.innerHTML = "";
-  choicesEl.style.display = "none";
 
   answers.forEach(answer => {
 
@@ -1048,13 +1042,7 @@ function nextQuestion(){
 
     btn.type = "button";
     btn.setAttribute("aria-label", `Đáp án ${answer}`);
-    btn.type = "button";
-    btn.setAttribute("aria-label", `Đáp án ${answer}`);
     btn.addEventListener("click", () => checkAnswer(answer));
-    btn.addEventListener("touchend", (event) => {
-      event.preventDefault();
-      checkAnswer(answer);
-    }, {passive:false});
 
     choicesEl.appendChild(btn);
 
@@ -1066,10 +1054,10 @@ function nextQuestion(){
 
 function checkAnswer(answer){
 
-  clearInterval(timer);
+  const buttons = document.querySelectorAll(".choice");
+  if([...buttons].some(btn => btn.disabled)) return;
 
-  const buttons =
-    document.querySelectorAll(".choice");
+  clearInterval(timer);
 
   buttons.forEach(btn => {
     btn.disabled = true;
@@ -1186,10 +1174,6 @@ startArea.style.display = "flex";
 restartBtn.style.display = "none";
 
 startGameBtn.addEventListener("click", startGame);
-startGameBtn.addEventListener("touchend", (event) => {
-  event.preventDefault();
-  startGame();
-}, {passive:false});
 
 </script>
 </body>
