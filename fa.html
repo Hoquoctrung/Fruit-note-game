@@ -921,6 +921,8 @@ function drawNote(note){
 
 function nextQuestion(){
 
+  choicesEl.style.display = "grid";
+
   clearInterval(timer);
 
   if(question > totalQuestions){
@@ -1034,6 +1036,7 @@ function nextQuestion(){
   );
 
   choicesEl.innerHTML = "";
+  choicesEl.style.display = "none";
 
   answers.forEach(answer => {
 
@@ -1132,35 +1135,15 @@ function endGame(){
   choicesEl.innerHTML = "";
   choicesEl.style.display = "none";
 
-  const startArea = document.getElementById("startArea");
   if(startArea){
     startArea.style.display = "none";
   }
 
   restartBtn.style.display = "block";
 
-  document.getElementById("timerBox").innerHTML = "🏁 Hoàn thành!";
-  document.getElementById("timerValue").innerText = "✓";
-
   if(score === 20){
-
     playClapSound();
-
-    messageEl.innerHTML =
-      `👏👏👏<br>20/20 PERFECT!<br>🏆 SIÊU XUẤT SẮC!`;
-
-  }else{
-
-    messageEl.innerHTML =
-      `🎹 Bé được ${score}/20 điểm!
-      <br>
-      🌈 Chơi rất tốt!`;
-
   }
-
-  messageEl.className =
-    "message correct";
-
 }
 
 restartBtn.onclick = () => {
@@ -1186,7 +1169,6 @@ function startGame(){
 
   document.getElementById("message").innerHTML = "";
 
-  const startArea = document.getElementById("startArea");
   if(startArea){
     startArea.style.display = "none";
   }
