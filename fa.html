@@ -1,0 +1,1214 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+<title>Fruit Piano Challenge 🎹 - Khóa Fa</title>
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&display=swap');
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+}
+
+:root{
+  --purple:#6841d8;
+  --purple-dark:#4d2bb0;
+  --purple-light:#eee7ff;
+  --border:#cbb9ff;
+  --ink:#3f2d76;
+}
+
+body{
+  min-height:100vh;
+  background:
+    radial-gradient(circle at 12% 12%,rgba(255,255,255,.95) 0 7%,transparent 20%),
+    radial-gradient(circle at 88% 18%,rgba(255,255,255,.8) 0 6%,transparent 18%),
+    linear-gradient(180deg,#eee8ff 0%,#cfc0ff 48%,#b09aff 100%);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:18px;
+  font-family:"Nunito","Comic Sans MS",sans-serif;
+  color:var(--ink);
+}
+
+.game{
+  position:relative;
+  width:1220px;
+  max-width:100%;
+  min-height:760px;
+  padding:24px 30px 28px;
+  background:rgba(255,255,255,.96);
+  border:7px solid #b9a1ff;
+  border-radius:42px;
+  box-shadow:0 20px 55px rgba(66,35,145,.25);
+  text-align:center;
+  overflow:hidden;
+}
+
+.game::before{
+  content:"";
+  position:absolute;
+  inset:8px;
+  border:2px solid rgba(255,255,255,.85);
+  border-radius:34px;
+  pointer-events:none;
+}
+
+.fruits{
+  position:relative;
+  z-index:1;
+  font-size:52px;
+  line-height:1;
+  letter-spacing:8px;
+  margin-bottom:4px;
+}
+
+.title{
+  position:relative;
+  z-index:1;
+  font-size:48px;
+  line-height:1;
+  color:var(--purple-dark);
+  font-weight:900;
+  letter-spacing:-1px;
+  text-shadow:0 3px 0 #e8deff;
+}
+
+.subtitle{
+  position:relative;
+  z-index:1;
+  margin-top:9px;
+  color:#7258b7;
+  font-size:24px;
+  font-weight:800;
+}
+
+.level-box{
+  position:relative;
+  z-index:1;
+  width:min(620px,90%);
+  margin:18px auto 14px;
+  background:linear-gradient(180deg,#fbf9ff,#f2edff);
+  border:3px dashed #a88cf4;
+  border-radius:24px;
+  padding:11px 18px;
+  font-size:27px;
+  font-weight:900;
+  color:var(--purple);
+  box-shadow:0 5px 14px rgba(91,54,180,.08);
+}
+
+.score-board{
+  position:relative;
+  z-index:1;
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:18px;
+  margin:0 auto 18px;
+  max-width:1080px;
+}
+
+.box{
+  background:#fff;
+  border:3px solid #d0c1ff;
+  border-radius:20px;
+  padding:14px 20px;
+  font-size:24px;
+  font-weight:900;
+  color:var(--purple-dark);
+  box-shadow:0 5px 14px rgba(91,54,180,.08);
+}
+
+.box:nth-child(1) span{color:#27a34a;}
+.box:nth-child(2) span{color:#e28a18;}
+
+.timer{display:none;}
+
+.warning{
+  animation:blink .5s infinite;
+  transform:scale(1.08);
+}
+
+@keyframes blink{
+  0%,100%{opacity:1}
+  50%{opacity:.25}
+}
+
+.staff{
+  position:relative;
+  z-index:1;
+  width:100%;
+  background:#fff;
+  border:3px dashed #c8b5ff;
+  border-radius:30px;
+  padding:18px 20px 12px;
+  box-shadow:inset 0 0 30px rgba(110,70,220,.035);
+}
+
+.staff svg{
+  display:block;
+  width:100%;
+  height:auto;
+  max-height:300px;
+}
+
+.question{
+  position:relative;
+  z-index:1;
+  margin-top:18px;
+  font-size:38px;
+  line-height:1.15;
+  color:var(--purple-dark);
+  font-weight:900;
+}
+
+.choices{
+  position:relative;
+  z-index:1;
+  margin:16px auto 0;
+  display:grid;
+  grid-template-columns:repeat(var(--choice-count, 4), minmax(0, 1fr));
+  gap:18px;
+  width:min(1080px, 100%);
+  margin-left:auto;
+  margin-right:auto;
+}
+
+.choice{
+  border:3px solid transparent;
+  min-height:94px;
+  padding:12px 10px;
+  border-radius:22px;
+  font-family:inherit;
+  font-size:27px;
+  font-weight:900;
+  cursor:pointer;
+  transition:transform .18s,box-shadow .18s;
+  box-shadow:0 7px 16px rgba(64,38,135,.10);
+}
+
+.choice:hover:not(:disabled){
+  transform:translateY(-4px) scale(1.02);
+  box-shadow:0 11px 20px rgba(64,38,135,.16);
+}
+
+.choice:disabled{
+  cursor:default;
+  opacity:.8;
+}
+
+.choice:nth-child(1){
+  background:#fff0f1;
+  color:#e33b52;
+  border-color:#ff8996;
+}
+
+.choice:nth-child(2){
+  background:#edf4ff;
+  color:#3974cf;
+  border-color:#72a4ef;
+}
+
+.choice:nth-child(3){
+  background:#f4edff;
+  color:#7041d7;
+  border-color:#a579f1;
+}
+
+.choice:nth-child(4){
+  background:#fff8df;
+  color:#bd7b00;
+  border-color:#eab52e;
+}
+
+.message{
+  position:relative;
+  z-index:1;
+  min-height:72px;
+  margin:12px auto 0;
+  padding:10px 18px;
+  max-width:850px;
+  font-size:23px;
+  line-height:1.25;
+  font-weight:900;
+}
+
+.correct{color:#2b984b;}
+.wrong{color:#d73761;}
+
+.restart,.start-btn{
+  position:relative;
+  z-index:2;
+  border:none;
+  padding:14px 30px;
+  border-radius:22px;
+  background:linear-gradient(180deg,#7950e8,#5831c1);
+  color:white;
+  font-family:inherit;
+  font-size:23px;
+  font-weight:900;
+  cursor:pointer;
+  box-shadow:0 7px 0 #43259d,0 12px 20px rgba(75,42,160,.25);
+  transition:transform .15s,box-shadow .15s;
+}
+
+.restart:hover,.start-btn:hover{
+  transform:translateY(-3px);
+  box-shadow:0 10px 0 #43259d,0 15px 24px rgba(75,42,160,.25);
+}
+
+.restart:active,.start-btn:active{
+  transform:translateY(3px);
+  box-shadow:0 4px 0 #43259d,0 8px 14px rgba(75,42,160,.2);
+}
+
+@media(max-width:850px){
+  .game{padding:20px 16px 24px;border-radius:30px;}
+  .title{font-size:36px;}
+  .subtitle{font-size:18px;}
+  .score-board{grid-template-columns:1fr;gap:10px;}
+  .timer{margin-top:10px;margin-bottom:12px;}
+  .choices{
+    grid-template-columns:repeat(
+      min(2, var(--choice-count, 2)),
+      minmax(0, 1fr)
+    );
+  }
+  .question{font-size:29px;}
+}
+
+@media(max-width:520px){
+  body{padding:8px;}
+  .game{border-width:4px;}
+  .fruits{font-size:34px;letter-spacing:3px;}
+  .title{font-size:29px;}
+  .subtitle{font-size:15px;}
+  .level-box{font-size:21px;}
+  .box{font-size:19px;}
+  .choices{gap:10px;}
+  .choice{font-size:20px;min-height:68px;}
+}
+
+/* Android + iOS touch optimization */
+html, body{
+  width:100%;
+  min-height:100%;
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
+  overscroll-behavior:none;
+}
+
+body{
+  padding:
+    max(10px, env(safe-area-inset-top))
+    max(10px, env(safe-area-inset-right))
+    max(10px, env(safe-area-inset-bottom))
+    max(10px, env(safe-area-inset-left));
+  -webkit-tap-highlight-color:transparent;
+}
+
+button{
+  -webkit-appearance:none;
+  appearance:none;
+  -webkit-user-select:none;
+  user-select:none;
+  touch-action:manipulation;
+}
+
+.game{
+  -webkit-touch-callout:none;
+}
+
+.choice,.start-btn,.restart{
+  touch-action:manipulation;
+  min-height:76px;
+}
+
+@media (max-width:700px){
+  body{
+    align-items:flex-start;
+    padding:
+      max(8px, env(safe-area-inset-top))
+      max(8px, env(safe-area-inset-right))
+      max(8px, env(safe-area-inset-bottom))
+      max(8px, env(safe-area-inset-left));
+  }
+
+  .game{
+    width:100%;
+    min-height:calc(100dvh - 16px);
+    padding:18px 12px 22px;
+    border-radius:28px;
+  }
+
+  .title{font-size:32px;}
+  .subtitle{font-size:17px;}
+  .fruits{font-size:34px;}
+
+  .score-board{
+    grid-template-columns:repeat(3,1fr);
+    gap:8px;
+  }
+
+  .box{
+    min-width:0;
+    padding:10px 5px;
+    font-size:16px;
+  }
+
+  .staff{
+    padding:12px 6px 8px;
+    border-radius:22px;
+  }
+
+  .staff svg{
+    width:100%;
+    height:auto;
+  }
+
+  .question{
+    margin-top:12px;
+    font-size:28px;
+  }
+
+  .choices{
+    gap:10px;
+    margin-top:14px;
+  }
+
+  .choice{
+    min-height:68px;
+    padding:10px 6px;
+    font-size:20px;
+    border-radius:18px;
+  }
+
+  .message{
+    font-size:20px;
+    min-height:60px;
+  }
+
+  .start-btn,.restart{
+    min-height:64px;
+    font-size:21px;
+    padding:13px 25px;
+  }
+}
+
+@media (max-width:430px){
+  .game{padding:14px 9px 18px;}
+  .title{font-size:27px;}
+  .subtitle{font-size:14px;}
+  .fruits{font-size:29px;letter-spacing:1px;}
+
+  .score-board{
+    grid-template-columns:repeat(3,1fr);
+  }
+
+  .box{
+    font-size:14px;
+    border-radius:15px;
+  }
+
+  .question{font-size:25px;}
+
+  .choices{
+    grid-template-columns:repeat(
+      min(2, var(--choice-count, 2)),
+      minmax(0,1fr)
+    );
+  }
+}
+
+/* Landscape phones: keep the whole game usable without giant vertical gaps */
+@media (max-height:520px) and (orientation:landscape){
+  body{align-items:flex-start;}
+  .game{
+    min-height:auto;
+    padding:10px 18px 14px;
+  }
+  .fruits{font-size:28px;margin-bottom:2px;}
+  .title{font-size:28px;}
+  .subtitle{font-size:14px;margin-top:4px;}
+  .level-box{margin:8px auto;font-size:19px;padding:7px;}
+  .score-board{margin-bottom:8px;}
+  .box{padding:7px;font-size:15px;}
+  .staff{padding:8px 12px;}
+  .question{font-size:24px;margin-top:7px;}
+  .choices{margin-top:8px;}
+  .choice{min-height:54px;padding:7px;font-size:18px;}
+}
+
+
+/* ===== Android + iOS mobile support ===== */
+html,body{
+  width:100%;
+  min-height:100%;
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
+  overscroll-behavior:none;
+}
+
+body{
+  -webkit-tap-highlight-color:transparent;
+}
+
+button{
+  -webkit-appearance:none;
+  appearance:none;
+  -webkit-user-select:none;
+  user-select:none;
+  touch-action:manipulation;
+  -webkit-touch-callout:none;
+}
+
+.choice,.start-btn,.restart{
+  touch-action:manipulation;
+}
+
+.start-area{
+  width:100%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  margin:16px auto 0;
+}
+
+.start-area .start-btn{
+  display:block;
+  margin:0 auto;
+}
+
+@media(max-width:700px){
+  body{
+    align-items:flex-start;
+    padding:
+      max(8px, env(safe-area-inset-top))
+      max(8px, env(safe-area-inset-right))
+      max(8px, env(safe-area-inset-bottom))
+      max(8px, env(safe-area-inset-left));
+    overflow-x:hidden;
+  }
+
+  .game{
+    width:100%;
+    max-width:100%;
+    min-height:0;
+    padding:14px 10px 20px;
+    border-radius:28px;
+  }
+
+  .fruits{font-size:32px;letter-spacing:2px;}
+  .title{font-size:30px;line-height:1.05;}
+  .subtitle{font-size:16px;margin-top:6px;}
+
+  .level-box{
+    width:92%;
+    margin:11px auto 11px;
+    padding:9px 10px;
+    font-size:21px;
+    border-radius:19px;
+  }
+
+  .score-board{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:8px;
+    margin:0 auto 11px;
+  }
+
+  .box{
+    min-width:0;
+    padding:9px 4px;
+    font-size:15px;
+    border-radius:16px;
+  }
+
+  .staff{
+    width:100%;
+    padding:9px 5px 6px;
+    border-radius:22px;
+  }
+
+  .staff svg{
+    width:100%;
+    height:auto;
+    max-height:none;
+  }
+
+  .question{
+    margin-top:11px;
+    font-size:26px;
+  }
+
+  .timer{
+    margin-top:7px;
+    font-size:22px;
+  }
+
+  .choices{
+    width:100%;
+    margin:12px auto 0;
+    gap:10px;
+  }
+
+  .choice{
+    min-height:64px;
+    padding:9px 5px;
+    font-size:19px;
+    border-radius:17px;
+  }
+
+  .message{
+    margin-top:8px;
+    min-height:48px;
+    font-size:19px;
+  }
+
+  .start-area{
+    margin-top:11px;
+    min-height:62px;
+  }
+
+  .start-btn,.restart{
+    min-height:58px;
+    padding:12px 24px;
+    font-size:20px;
+    border-radius:20px;
+  }
+}
+
+@media(max-width:430px){
+  .game{padding:11px 8px 17px;}
+  .fruits{font-size:27px;}
+  .title{font-size:27px;}
+  .subtitle{font-size:14px;}
+  .level-box{font-size:19px;}
+  .box{font-size:13px;}
+  .question{font-size:23px;}
+  .choice{font-size:18px;min-height:60px;}
+}
+
+@media(max-height:520px) and (orientation:landscape){
+  body{align-items:flex-start;}
+  .game{min-height:0;padding:9px 16px 12px;}
+  .fruits{font-size:24px;}
+  .title{font-size:27px;}
+  .subtitle{font-size:13px;margin-top:3px;}
+  .level-box{margin:7px auto;padding:6px;font-size:17px;}
+  .score-board{margin-bottom:7px;}
+  .box{padding:6px;font-size:13px;}
+  .staff{padding:6px 10px;}
+  .question{font-size:21px;margin-top:5px;}
+  .choices{margin-top:6px;}
+  .choice{min-height:48px;padding:5px;font-size:16px;}
+  .start-area{margin-top:6px;min-height:48px;}
+  .start-btn,.restart{min-height:48px;padding:8px 20px;font-size:17px;}
+}
+
+</style>
+</head>
+<body>
+<div class="game">
+
+  <div class="fruits">🍒 🫐 🍇 🍌 🎹</div>
+
+  <div class="title">Fruit Piano Challenge</div>
+
+  <div class="subtitle">
+    Học đọc nốt nhạc Piano khóa Fa • Phạm vi C3 → C4
+  </div>
+
+  <div class="level-box" id="levelText">🍒 Cherry Level</div>
+
+  <div class="score-board">
+    <div class="box">⭐ Điểm: <span id="score">0</span></div>
+    <div class="box">🎯 Câu: <span id="questionNum">1</span>/20</div>
+    <div class="box">⏰ Thời gian: <span id="timerValue">—</span></div>
+  </div>
+
+  <div class="staff">
+    <svg viewBox="0 0 700 260" aria-label="Khuông nhạc khóa Fa">
+
+      <line x1="100" y1="60" x2="600" y2="60" stroke="#111" stroke-width="3"/>
+      <line x1="100" y1="90" x2="600" y2="90" stroke="#111" stroke-width="3"/>
+      <line x1="100" y1="120" x2="600" y2="120" stroke="#111" stroke-width="3"/>
+      <line x1="100" y1="150" x2="600" y2="150" stroke="#111" stroke-width="3"/>
+      <line x1="100" y1="180" x2="600" y2="180" stroke="#111" stroke-width="3"/>
+
+      <!-- Khóa Fa: giữ đúng vị trí đã căn chuẩn, bụng nằm trên dòng 2 từ trên xuống -->
+      <text x="112" y="120" font-size="120"
+            text-anchor="middle"
+            dominant-baseline="middle"
+            font-family="Noto Music, serif">𝄢</text>
+
+      <ellipse id="noteHead"
+        cx="420" cy="120"
+        rx="18" ry="13"
+        fill="#6841d8"
+        transform="rotate(-20 420 120)"
+      />
+
+      <line id="stem"
+        x1="435" y1="120"
+        x2="435" y2="55"
+        stroke="#6841d8"
+        stroke-width="5"
+        stroke-linecap="round"
+      />
+
+      <line id="ledger"
+        x1="390" y1="0"
+        x2="450" y2="0"
+        stroke="#111"
+        stroke-width="3"
+        style="display:none;"
+      />
+    </svg>
+  </div>
+
+  <div class="question">🎵 Đây là nốt gì?</div>
+
+  <div class="timer" id="timerBox">⏰ Chưa bắt đầu</div>
+
+  <div class="choices" id="choices"></div>
+
+  <div class="start-area" id="startArea">
+    <button type="button" id="startGameBtn" class="start-btn">
+      ▶ START GAME
+    </button>
+  </div>
+
+  <div class="message" id="message"></div>
+
+  <button type="button" class="restart" id="restartBtn">🔄 Chơi lại</button>
+</div>
+<script>
+
+const allNotes = [
+
+  // Khóa Fa theo bố cục game:
+  // Fa3 = dòng kẻ thứ 2 từ trên xuống (y=90)
+  {name:"Do3", y:135, weight:1},
+  {name:"Re3", y:120, weight:1},
+  {name:"Mi3", y:105, weight:1},
+  {name:"Fa3", y:90, weight:1},
+  {name:"Sol3", y:75, weight:2},
+  {name:"La3", y:60, weight:2},
+  {name:"Si3", y:45, weight:2},
+  {name:"Do4", y:30, ledger:true, weight:3}
+
+];
+
+const levels = [
+
+  {
+    name:"🍒 Cherry Level",
+    notes:["Do3","Re3","Mi3","Fa3"],
+    choices:2,
+    timeLimit:25
+  },
+
+  {
+    name:"🫐 Việt Quất Level",
+    notes:["Do3","Re3","Mi3","Fa3","Sol3","La3","Si3"],
+    choices:3,
+    timeLimit:20
+  },
+
+  {
+    name:"🍇 Nho Level",
+    notes:["Do3","Re3","Mi3","Fa3","Sol3","La3","Si3","Do4"],
+    choices:4,
+    timeLimit:15
+  },
+
+  {
+    name:"🍌 Chuối Level",
+    notes:["Do3","Re3","Mi3","Fa3","Sol3","La3","Si3","Do4"],
+    choices:4,
+    timeLimit:10
+  }
+
+];
+
+const praiseMessages = [
+  "🌟 Giỏi lắm!",
+  "🎉 Chính xác!",
+  "👏 Hay lắm!",
+  "💜 Xuất sắc!",
+  "🎵 Đúng rồi nha!",
+  "✨ Quá giỏi!",
+  "🥳 Tuyệt vời!",
+  "🌈 Siêu đỉnh!"
+];
+
+const encourageMessages = [
+  "💜 Không sao đâu!",
+  "🌸 Thử lại nhé!",
+  "✨ Gần đúng rồi!",
+  "🎵 Cố lên nha!",
+  "🥰 Bé làm được mà!"
+];
+
+let currentLevel = 0;
+let score = 0;
+let question = 1;
+let current;
+let timer;
+let timeLeft;
+let gameStarted = false;
+
+const totalQuestions = 20;
+
+const scoreEl = document.getElementById("score");
+const questionEl = document.getElementById("questionNum");
+const choicesEl = document.getElementById("choices");
+const messageEl = document.getElementById("message");
+const restartBtn = document.getElementById("restartBtn");
+const levelText = document.getElementById("levelText");
+
+function randomItem(arr){
+
+  return arr[Math.floor(Math.random()*arr.length)];
+
+}
+
+function shuffle(array){
+
+  return array.sort(() => Math.random()-0.5);
+
+}
+
+function weightedRandom(notes){
+
+  const expanded = [];
+
+  notes.forEach(note => {
+
+    for(let i=0;i<note.weight;i++){
+
+      expanded.push(note);
+
+    }
+
+  });
+
+  return expanded[
+    Math.floor(Math.random()*expanded.length)
+  ];
+
+}
+
+function getCurrentNotes(){
+
+  return allNotes.filter(note =>
+    levels[currentLevel].notes.includes(note.name)
+  );
+
+}
+
+async 
+let audioCtx = null;
+
+async function initAudio(){
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  if(!AudioCtx) return null;
+
+  if(!audioCtx){
+    audioCtx = new AudioCtx();
+  }
+
+  if(audioCtx.state === "suspended"){
+    try{ await audioCtx.resume(); }catch(e){}
+  }
+
+  return audioCtx;
+}
+
+function tone(freq, duration, type="triangle", volume=0.12, endFreq=null){
+  if(!audioCtx) return;
+
+  const now = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, now);
+
+  if(endFreq){
+    osc.frequency.exponentialRampToValueAtTime(
+      endFreq, now + duration
+    );
+  }
+
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(
+    volume, now + 0.015
+  );
+  gain.gain.exponentialRampToValueAtTime(
+    0.0001, now + duration
+  );
+
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+
+  osc.start(now);
+  osc.stop(now + duration + 0.02);
+}
+
+async function playCorrectSound(){
+  await initAudio();
+  tone(950,0.20,"triangle",0.15,1400);
+}
+
+async function playWrongSound(){
+  await initAudio();
+  tone(220,0.30,"sawtooth",0.15,120);
+}
+
+async function playWarningSound(){
+  if(!audioCtx) return;
+  tone(1400,0.12,"square",0.10);
+}
+
+async function playClapSound(){
+  await initAudio();
+  if(!audioCtx) return;
+
+  [523.25,659.25,783.99,1046.50].forEach((f,i)=>{
+    setTimeout(()=>tone(f,0.28,"triangle",0.14),i*110);
+  });
+}
+
+function drawNote(note){
+
+  document.getElementById("noteHead")
+    .setAttribute("cy", note.y);
+
+  document.getElementById("noteHead")
+    .setAttribute(
+      "transform",
+      `rotate(-20 420 ${note.y})`
+    );
+
+  document.getElementById("stem")
+    .setAttribute("y1", note.y);
+
+  document.getElementById("stem")
+    .setAttribute("y2", note.y - 65);
+
+  const ledger = document.getElementById("ledger");
+
+  if(note.ledger){
+
+    ledger.style.display = "block";
+
+    ledger.setAttribute("y1", note.y);
+    ledger.setAttribute("y2", note.y);
+
+  }else{
+
+    ledger.style.display = "none";
+  }
+
+}
+
+function nextQuestion(){
+
+  clearInterval(timer);
+
+  if(question > totalQuestions){
+
+    endGame();
+    return;
+  }
+
+  messageEl.innerHTML = "";
+
+  levelText.innerHTML =
+    levels[currentLevel].name;
+
+  const availableNotes =
+    getCurrentNotes();
+
+  current = weightedRandom(availableNotes);
+
+  drawNote(current);
+
+  timeLeft =
+    levels[currentLevel].timeLimit;
+
+  document.getElementById("timerBox").innerHTML = `⏰ ${timeLeft}s`;
+    document.getElementById("timerValue").innerText = `${timeLeft}s`;
+
+  timer = setInterval(() => {
+
+    timeLeft--;
+
+    document.getElementById("timerBox").innerHTML = `⏰ ${timeLeft}s`;
+    document.getElementById("timerValue").innerText = `${timeLeft}s`;
+
+    if(timeLeft <= 3){
+
+      document
+      .getElementById("timerBox")
+      .classList.add("warning");
+
+      playWarningSound();
+
+    }else{
+
+      document
+      .getElementById("timerBox")
+      .classList.remove("warning");
+
+    }
+
+    if(timeLeft <= 0){
+
+      clearInterval(timer);
+
+      document
+      .getElementById("timerBox")
+      .classList.remove("warning");
+
+      messageEl.innerHTML =
+        "⏰ Hết giờ rồi!";
+
+      messageEl.className =
+        "message wrong";
+
+      question++;
+
+      questionEl.innerText =
+      Math.min(question,totalQuestions);
+
+      setTimeout(() => {
+
+        nextQuestion();
+
+      },1200);
+
+    }
+
+  },1000);
+
+  let answers = [current.name];
+
+  while(
+    answers.length <
+    levels[currentLevel].choices
+  ){
+
+    let random =
+      availableNotes[
+        Math.floor(Math.random()*availableNotes.length)
+      ].name;
+
+    if(!answers.includes(random)){
+
+      answers.push(random);
+
+    }
+
+  }
+
+  answers = shuffle(answers);
+
+  choicesEl.style.display = "grid";
+
+  choicesEl.style.setProperty(
+    "--choice-count",
+    levels[currentLevel].choices
+  );
+
+  choicesEl.style.setProperty(
+    "--choice-count",
+    levels[currentLevel].choices
+  );
+
+  choicesEl.innerHTML = "";
+
+  answers.forEach(answer => {
+
+    const btn = document.createElement("button");
+
+    btn.className = "choice";
+
+    btn.innerText = answer;
+
+    btn.type = "button";
+    btn.setAttribute("aria-label", `Đáp án ${answer}`);
+    btn.type = "button";
+    btn.setAttribute("aria-label", `Đáp án ${answer}`);
+    btn.addEventListener("click", () => checkAnswer(answer));
+    btn.addEventListener("touchend", (event) => {
+      event.preventDefault();
+      checkAnswer(answer);
+    }, {passive:false});
+
+    choicesEl.appendChild(btn);
+
+  });
+
+  questionEl.innerText = question;
+
+}
+
+function checkAnswer(answer){
+
+  clearInterval(timer);
+
+  const buttons =
+    document.querySelectorAll(".choice");
+
+  buttons.forEach(btn => {
+    btn.disabled = true;
+    btn.style.touchAction = "none";
+  });
+
+  if(answer === current.name){
+
+    playCorrectSound();
+
+    score++;
+
+    scoreEl.innerText = score;
+
+    messageEl.innerHTML =
+      randomItem(praiseMessages);
+
+    messageEl.className =
+      "message correct";
+
+  }else{
+
+    playWrongSound();
+
+    messageEl.innerHTML =
+      `${randomItem(encourageMessages)}
+      <br>
+      🌸 Đáp án là ${current.name}`;
+
+    messageEl.className =
+      "message wrong";
+
+  }
+
+  if(question === 6){
+
+    currentLevel = 1;
+
+  }else if(question === 11){
+
+    currentLevel = 2;
+
+  }else if(question === 16){
+
+    currentLevel = 3;
+
+  }
+
+  question++;
+
+  setTimeout(() => {
+
+    nextQuestion();
+
+  },1600);
+
+}
+
+function endGame(){
+
+  clearInterval(timer);
+
+  choicesEl.innerHTML = "";
+  choicesEl.style.display = "none";
+
+  const startArea = document.getElementById("startArea");
+  if(startArea){
+    startArea.style.display = "none";
+  }
+
+  restartBtn.style.display = "block";
+
+  document.getElementById("timerBox").innerHTML = "🏁 Hoàn thành!";
+  document.getElementById("timerValue").innerText = "✓";
+
+  if(score === 20){
+
+    playClapSound();
+
+    messageEl.innerHTML =
+      `👏👏👏<br>20/20 PERFECT!<br>🏆 SIÊU XUẤT SẮC!`;
+
+  }else{
+
+    messageEl.innerHTML =
+      `🎹 Bé được ${score}/20 điểm!
+      <br>
+      🌈 Chơi rất tốt!`;
+
+  }
+
+  messageEl.className =
+    "message correct";
+
+}
+
+restartBtn.onclick = () => {
+
+  clearInterval(timer);
+
+  score = 0;
+  question = 1;
+  currentLevel = 0;
+
+  scoreEl.innerText = score;
+
+  restartBtn.style.display = "none";
+  gameStarted = false;
+  startGame();
+
+};
+
+function startGame(){
+
+  if(gameStarted) return;
+  gameStarted = true;
+
+  document.getElementById("message").innerHTML = "";
+
+  const startArea = document.getElementById("startArea");
+  if(startArea){
+    startArea.style.display = "none";
+  }
+
+  initAudio();
+  nextQuestion();
+}
+
+choicesEl.style.display = "none";
+
+const startArea = document.getElementById("startArea");
+const startGameBtn = document.getElementById("startGameBtn");
+
+startArea.style.display = "flex";
+restartBtn.style.display = "none";
+
+startGameBtn.addEventListener("click", startGame);
+startGameBtn.addEventListener("touchend", (event) => {
+  event.preventDefault();
+  startGame();
+}, {passive:false});
+
+</script>
+</body>
+</html>
