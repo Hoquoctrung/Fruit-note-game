@@ -1,0 +1,1026 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
+
+<title>Fruit Piano Challenge 🎹</title>
+
+<style>
+
+*{
+  margin:0;
+  padding:0;
+  box-sizing:border-box;
+  font-family:"Comic Sans MS", sans-serif;
+}
+
+body{
+  min-height:100vh;
+  background:linear-gradient(180deg,#d0bfff,#9775fa,#7048e8);
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  padding:20px;
+}
+
+.game{
+  width:1000px;
+  max-width:100%;
+  background:white;
+  border-radius:40px;
+  padding:30px;
+  box-shadow:0 15px 40px rgba(0,0,0,0.25);
+  text-align:center;
+  border:8px solid #c0a7ff;
+}
+
+.title{
+  font-size:48px;
+  color:#5f3dc4;
+  font-weight:bold;
+}
+
+.subtitle{
+  margin-top:10px;
+  color:#666;
+  font-size:20px;
+}
+
+.fruits{
+  font-size:58px;
+  margin-bottom:10px;
+}
+
+.level-box{
+  margin-top:20px;
+  background:#f3f0ff;
+  border-radius:25px;
+  padding:15px;
+  border:4px dashed #9775fa;
+  font-size:28px;
+  font-weight:bold;
+  color:#5f3dc4;
+}
+
+.score-board{
+  display:flex;
+  justify-content:center;
+  flex-wrap:wrap;
+  gap:20px;
+  margin:25px 0;
+}
+
+.box{
+  background:#faf5ff;
+  border:4px dashed #b197fc;
+  border-radius:24px;
+  padding:15px 28px;
+  font-size:24px;
+  color:#5f3dc4;
+  font-weight:bold;
+  min-width:210px;
+}
+
+.staff{
+  background:#fcfaff;
+  border-radius:30px;
+  padding:25px;
+  border:5px dashed #d0bfff;
+}
+
+svg{
+  width:100%;
+  max-width:760px;
+}
+
+.question{
+  margin-top:25px;
+  font-size:34px;
+  color:#5f3dc4;
+  font-weight:bold;
+}
+
+.choices{
+  margin-top:30px;
+  display:grid;
+  grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+  gap:18px;
+}
+
+.choice{
+  border:none;
+  padding:20px;
+  border-radius:24px;
+  font-size:26px;
+  font-weight:bold;
+  cursor:pointer;
+  transition:0.2s;
+  color:white;
+}
+
+.choice:hover{
+  transform:scale(1.08);
+}
+
+.choice:nth-child(1){
+  background:#ff6b6b;
+}
+
+.choice:nth-child(2){
+  background:#5c7cfa;
+}
+
+.choice:nth-child(3){
+  background:#845ef7;
+}
+
+.choice:nth-child(4){
+  background:#fcc419;
+  color:#5c3d00;
+}
+
+.message{
+  margin-top:28px;
+  min-height:70px;
+  font-size:30px;
+  font-weight:bold;
+}
+
+.correct{
+  color:#2b8a3e;
+}
+
+.wrong{
+  color:#d6336c;
+}
+
+.restart{
+  margin-top:25px;
+  border:none;
+  padding:18px 32px;
+  border-radius:25px;
+  background:#5f3dc4;
+  color:white;
+  font-size:24px;
+  font-weight:bold;
+  cursor:pointer;
+  display:none;
+}
+
+.timer{display:none; margin-top:15px; font-size:32px;
+  font-weight:bold;
+  color:#e03131;
+  transition:0.2s;
+}
+
+.warning{
+  animation:blink 0.5s infinite;
+  transform:scale(1.12);
+}
+
+@keyframes blink{
+
+  0%{
+    opacity:1;
+  }
+
+  50%{
+    opacity:0.2;
+  }
+
+  100%{
+    opacity:1;
+  }
+
+}
+
+.start-btn{
+  border:none;
+  padding:22px 40px;
+  border-radius:30px;
+  background:#5f3dc4;
+  color:white;
+  font-size:32px;
+  font-weight:bold;
+  cursor:pointer;
+  transition:0.2s;
+}
+
+.start-btn:hover{
+  transform:scale(1.08);
+}
+
+@media(max-width:700px){
+
+  .title{
+    font-size:34px;
+  }
+
+  .question{
+    font-size:26px;
+  }
+
+  .choice{
+    font-size:22px;
+  }
+
+  .choices{
+    grid-template-columns:repeat(
+      min(2, var(--choice-count, 2)),
+      minmax(0,1fr)
+    );
+  }
+
+}
+
+
+/* ===== Android + iOS mobile support ===== */
+html,body{
+  width:100%;
+  min-height:100%;
+  -webkit-text-size-adjust:100%;
+  text-size-adjust:100%;
+  overscroll-behavior:none;
+}
+
+body{
+  -webkit-tap-highlight-color:transparent;
+}
+
+button{
+  -webkit-appearance:none;
+  appearance:none;
+  -webkit-user-select:none;
+  user-select:none;
+  touch-action:manipulation;
+  -webkit-touch-callout:none;
+}
+
+.choice,.start-btn,.restart{
+  touch-action:manipulation;
+}
+
+.start-area{
+  width:100%;
+  display:flex;
+  justify-content:center;
+  align-items:center;
+  margin:16px auto 0;
+}
+
+.start-area .start-btn{
+  display:block;
+  margin:0 auto;
+}
+
+@media(max-width:700px){
+  body{
+    align-items:flex-start;
+    padding:
+      max(8px, env(safe-area-inset-top))
+      max(8px, env(safe-area-inset-right))
+      max(8px, env(safe-area-inset-bottom))
+      max(8px, env(safe-area-inset-left));
+    overflow-x:hidden;
+  }
+
+  .game{
+    width:100%;
+    max-width:100%;
+    min-height:0;
+    padding:14px 10px 20px;
+    border-radius:28px;
+  }
+
+  .fruits{font-size:32px;letter-spacing:2px;}
+  .title{font-size:30px;line-height:1.05;}
+  .subtitle{font-size:16px;margin-top:6px;}
+
+  .level-box{
+    width:92%;
+    margin:11px auto 11px;
+    padding:9px 10px;
+    font-size:21px;
+    border-radius:19px;
+  }
+
+  .score-board{
+    display:grid;
+    grid-template-columns:repeat(3,minmax(0,1fr));
+    gap:8px;
+    margin:0 auto 11px;
+  }
+
+  .box{
+    min-width:0;
+    padding:9px 4px;
+    font-size:15px;
+    border-radius:16px;
+  }
+
+  .staff{
+    width:100%;
+    padding:9px 5px 6px;
+    border-radius:22px;
+  }
+
+  .staff svg{
+    width:100%;
+    height:auto;
+    max-height:none;
+  }
+
+  .question{
+    margin-top:11px;
+    font-size:26px;
+  }
+
+  .timer{
+    margin-top:7px;
+    font-size:22px;
+  }
+
+  .choices{
+    width:100%;
+    margin:12px auto 0;
+    gap:10px;
+  }
+
+  .choice{
+    min-height:64px;
+    padding:9px 5px;
+    font-size:19px;
+    border-radius:17px;
+  }
+
+  .message{
+    margin-top:8px;
+    min-height:48px;
+    font-size:19px;
+  }
+
+  .start-area{
+    margin-top:11px;
+    min-height:62px;
+  }
+
+  .start-btn,.restart{
+    min-height:58px;
+    padding:12px 24px;
+    font-size:20px;
+    border-radius:20px;
+  }
+}
+
+@media(max-width:430px){
+  .game{padding:11px 8px 17px;}
+  .fruits{font-size:27px;}
+  .title{font-size:27px;}
+  .subtitle{font-size:14px;}
+  .level-box{font-size:19px;}
+  .box{font-size:13px;}
+  .question{font-size:23px;}
+  .choice{font-size:18px;min-height:60px;}
+}
+
+@media(max-height:520px) and (orientation:landscape){
+  body{align-items:flex-start;}
+  .game{min-height:0;padding:9px 16px 12px;}
+  .fruits{font-size:24px;}
+  .title{font-size:27px;}
+  .subtitle{font-size:13px;margin-top:3px;}
+  .level-box{margin:7px auto;padding:6px;font-size:17px;}
+  .score-board{margin-bottom:7px;}
+  .box{padding:6px;font-size:13px;}
+  .staff{padding:6px 10px;}
+  .question{font-size:21px;margin-top:5px;}
+  .choices{margin-top:6px;}
+  .choice{min-height:48px;padding:5px;font-size:16px;}
+  .start-area{margin-top:6px;min-height:48px;}
+  .start-btn,.restart{min-height:48px;padding:8px 20px;font-size:17px;}
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="game">
+
+  <div class="fruits">
+    🍒🫐🍇🍌🎹
+  </div>
+
+  <div class="title">
+    Fruit Piano Challenge
+  </div>
+
+  <div class="subtitle">
+    Học đọc nốt nhạc Piano khoá Sol
+  </div>
+
+  <div class="level-box" id="levelText">
+    🍒 Cherry Level
+  </div>
+
+  <div class="score-board">
+
+    <div class="box">
+      ⭐ Điểm: <span id="score">0</span>
+    </div>
+
+    <div class="box">
+      🎯 Câu: <span id="questionNum">1</span>/20
+    </div>
+
+    <div class="box">
+      ⏰ Thời gian: <span id="timerValue">—</span>
+    </div>
+
+  </div>
+
+  <div class="staff">
+
+    <svg viewBox="0 0 700 260">
+
+      <line x1="100" y1="60" x2="600" y2="60" stroke="black" stroke-width="3"/>
+      <line x1="100" y1="90" x2="600" y2="90" stroke="black" stroke-width="3"/>
+      <line x1="100" y1="120" x2="600" y2="120" stroke="black" stroke-width="3"/>
+      <line x1="100" y1="150" x2="600" y2="150" stroke="black" stroke-width="3"/>
+      <line x1="100" y1="180" x2="600" y2="180" stroke="black" stroke-width="3"/>
+
+      <text x="120" y="165" font-size="120">𝄞</text>
+
+      <ellipse id="noteHead"
+        cx="420"
+        cy="120"
+        rx="18"
+        ry="13"
+        fill="#5f3dc4"
+        transform="rotate(-20 420 120)"
+      />
+
+      <line id="stem"
+        x1="435"
+        y1="120"
+        x2="435"
+        y2="55"
+        stroke="#5f3dc4"
+        stroke-width="5"
+      />
+
+      <line id="ledger"
+        x1="390"
+        y1="0"
+        x2="450"
+        y2="0"
+        stroke="black"
+        stroke-width="3"
+        style="display:none;"
+      />
+
+    </svg>
+
+  </div>
+
+  <div class="question">
+    🎵 Đây là nốt gì?
+  </div>
+
+  <div class="timer" id="timerBox">
+    ⏰ Chưa bắt đầu
+  </div>
+
+  <div class="choices" id="choices"></div>
+
+  <div class="start-area" id="startArea">
+    <button type="button" id="startGameBtn" class="start-btn">
+      ▶ START GAME
+    </button>
+  </div>
+
+  <div class="message" id="message"></div>
+
+  <button class="restart" id="restartBtn">
+    🔄 Chơi lại
+  </button>
+
+</div>
+
+<script>
+
+const allNotes = [
+
+  {name:"Do4", y:210, ledger:true, weight:1},
+  {name:"Re4", y:195, weight:1},
+  {name:"Mi4", y:180, weight:1},
+  {name:"Fa4", y:165, weight:1},
+  {name:"Sol4", y:150, weight:2},
+  {name:"La4", y:135, weight:2},
+  {name:"Si4", y:120, weight:2},
+  {name:"Do5", y:105, weight:3},
+  {name:"Re5", y:90, weight:3},
+  {name:"Mi5", y:75, weight:4},
+  {name:"Fa5", y:60, weight:5},
+  {name:"Sol5", y:45, weight:6}
+
+];
+
+const levels = [
+
+  {
+    name:"🍒 Cherry Level",
+    notes:["Do4","Re4","Mi4","Fa4"],
+    choices:2,
+    timeLimit:25
+  },
+
+  {
+    name:"🫐 Việt Quất Level",
+    notes:["Do4","Re4","Mi4","Fa4","Sol4","La4","Si4"],
+    choices:3,
+    timeLimit:20
+  },
+
+  {
+    name:"🍇 Nho Level",
+    notes:["Do4","Re4","Mi4","Fa4","Sol4","La4","Si4","Do5","Re5"],
+    choices:4,
+    timeLimit:15
+  },
+
+  {
+    name:"🍌 Chuối Level",
+    notes:["Do4","Re4","Mi4","Fa4","Sol4","La4","Si4","Do5","Re5","Mi5","Fa5","Sol5"],
+    choices:4,
+    timeLimit:10
+  }
+
+];
+
+const praiseMessages = [
+  "🌟 Giỏi lắm!",
+  "🎉 Chính xác!",
+  "👏 Hay lắm!",
+  "💜 Xuất sắc!",
+  "🎵 Đúng rồi nha!",
+  "✨ Quá giỏi!",
+  "🥳 Tuyệt vời!",
+  "🌈 Siêu đỉnh!"
+];
+
+const encourageMessages = [
+  "💜 Không sao đâu!",
+  "🌸 Thử lại nhé!",
+  "✨ Gần đúng rồi!",
+  "🎵 Cố lên nha!",
+  "🥰 Bé làm được mà!"
+];
+
+let currentLevel = 0;
+let score = 0;
+let question = 1;
+let current;
+let timer;
+let timeLeft;
+let gameStarted = false;
+
+const totalQuestions = 20;
+
+const scoreEl = document.getElementById("score");
+const questionEl = document.getElementById("questionNum");
+const choicesEl = document.getElementById("choices");
+const messageEl = document.getElementById("message");
+const restartBtn = document.getElementById("restartBtn");
+const levelText = document.getElementById("levelText");
+
+function randomItem(arr){
+
+  return arr[Math.floor(Math.random()*arr.length)];
+
+}
+
+function shuffle(array){
+
+  return array.sort(() => Math.random()-0.5);
+
+}
+
+function weightedRandom(notes){
+
+  const expanded = [];
+
+  notes.forEach(note => {
+
+    for(let i=0;i<note.weight;i++){
+
+      expanded.push(note);
+
+    }
+
+  });
+
+  return expanded[
+    Math.floor(Math.random()*expanded.length)
+  ];
+
+}
+
+function getCurrentNotes(){
+
+  return allNotes.filter(note =>
+    levels[currentLevel].notes.includes(note.name)
+  );
+
+}
+
+
+let audioCtx = null;
+
+async function initAudio(){
+  const AudioCtx = window.AudioContext || window.webkitAudioContext;
+  if(!AudioCtx) return null;
+
+  if(!audioCtx){
+    audioCtx = new AudioCtx();
+  }
+
+  if(audioCtx.state === "suspended"){
+    try{ await audioCtx.resume(); }catch(e){}
+  }
+
+  return audioCtx;
+}
+
+function tone(freq, duration, type="triangle", volume=0.12, endFreq=null){
+  if(!audioCtx) return;
+
+  const now = audioCtx.currentTime;
+  const osc = audioCtx.createOscillator();
+  const gain = audioCtx.createGain();
+
+  osc.type = type;
+  osc.frequency.setValueAtTime(freq, now);
+
+  if(endFreq){
+    osc.frequency.exponentialRampToValueAtTime(
+      endFreq, now + duration
+    );
+  }
+
+  gain.gain.setValueAtTime(0.0001, now);
+  gain.gain.exponentialRampToValueAtTime(
+    volume, now + 0.015
+  );
+  gain.gain.exponentialRampToValueAtTime(
+    0.0001, now + duration
+  );
+
+  osc.connect(gain);
+  gain.connect(audioCtx.destination);
+
+  osc.start(now);
+  osc.stop(now + duration + 0.02);
+}
+
+async function playCorrectSound(){
+  await initAudio();
+  tone(950,0.20,"triangle",0.15,1400);
+}
+
+async function playWrongSound(){
+  await initAudio();
+  tone(220,0.30,"sawtooth",0.15,120);
+}
+
+async function playWarningSound(){
+  if(!audioCtx) return;
+  tone(1400,0.12,"square",0.10);
+}
+
+async function playClapSound(){
+  await initAudio();
+  if(!audioCtx) return;
+
+  [523.25,659.25,783.99,1046.50].forEach((f,i)=>{
+    setTimeout(()=>tone(f,0.28,"triangle",0.14),i*110);
+  });
+}
+
+function drawNote(note){
+
+  document.getElementById("noteHead")
+    .setAttribute("cy", note.y);
+
+  document.getElementById("noteHead")
+    .setAttribute(
+      "transform",
+      `rotate(-20 420 ${note.y})`
+    );
+
+  document.getElementById("stem")
+    .setAttribute("y1", note.y);
+
+  document.getElementById("stem")
+    .setAttribute("y2", note.y - 65);
+
+  const ledger = document.getElementById("ledger");
+
+  if(note.ledger){
+
+    ledger.style.display = "block";
+
+    ledger.setAttribute("y1", note.y);
+    ledger.setAttribute("y2", note.y);
+
+  }else{
+
+    ledger.style.display = "none";
+  }
+
+}
+
+function nextQuestion(){
+
+  clearInterval(timer);
+
+  if(question > totalQuestions){
+
+    endGame();
+    return;
+  }
+
+  messageEl.innerHTML = "";
+
+  levelText.innerHTML =
+    levels[currentLevel].name;
+
+  const availableNotes =
+    getCurrentNotes();
+
+  current = weightedRandom(availableNotes);
+
+  drawNote(current);
+
+  timeLeft =
+    levels[currentLevel].timeLimit;
+
+  document.getElementById("timerBox")
+  .innerHTML = `⏰ ${timeLeft}s`;
+  document.getElementById("timerValue").innerText = `${timeLeft}s`;
+
+  timer = setInterval(() => {
+
+    timeLeft--;
+
+    document.getElementById("timerBox").innerHTML = `⏰ ${timeLeft}s`;
+    document.getElementById("timerValue").innerText = `${timeLeft}s`;
+
+    if(timeLeft <= 3){
+
+      document
+      .getElementById("timerBox")
+      .classList.add("warning");
+
+      playWarningSound();
+
+    }else{
+
+      document
+      .getElementById("timerBox")
+      .classList.remove("warning");
+
+    }
+
+    if(timeLeft <= 0){
+
+      clearInterval(timer);
+
+      document
+      .getElementById("timerBox")
+      .classList.remove("warning");
+
+      messageEl.innerHTML =
+        "⏰ Hết giờ rồi!";
+
+      messageEl.className =
+        "message wrong";
+
+      question++;
+
+      questionEl.innerText =
+      Math.min(question,totalQuestions);
+
+      setTimeout(() => {
+
+        nextQuestion();
+
+      },1200);
+
+    }
+
+  },1000);
+
+  let answers = [current.name];
+
+  while(
+    answers.length <
+    levels[currentLevel].choices
+  ){
+
+    let random =
+      availableNotes[
+        Math.floor(Math.random()*availableNotes.length)
+      ].name;
+
+    if(!answers.includes(random)){
+
+      answers.push(random);
+
+    }
+
+  }
+
+  answers = shuffle(answers);
+
+  choicesEl.style.display = "grid";
+
+  choicesEl.style.setProperty(
+    "--choice-count",
+    levels[currentLevel].choices
+  );
+
+  choicesEl.innerHTML = "";
+
+  answers.forEach(answer => {
+
+    const btn = document.createElement("button");
+
+    btn.className = "choice";
+
+    btn.innerText = answer;
+
+    btn.type = "button";
+    btn.setAttribute("aria-label", `Đáp án ${answer}`);
+    btn.addEventListener("click", () => checkAnswer(answer));
+    btn.addEventListener("touchend", (event) => {
+      event.preventDefault();
+      checkAnswer(answer);
+    }, {passive:false});
+
+    choicesEl.appendChild(btn);
+
+  });
+
+  questionEl.innerText = question;
+
+}
+
+function checkAnswer(answer){
+
+  clearInterval(timer);
+
+  const buttons =
+    document.querySelectorAll(".choice");
+
+  buttons.forEach(btn => btn.disabled = true);
+
+  if(answer === current.name){
+
+    playCorrectSound();
+
+    score++;
+
+    scoreEl.innerText = score;
+
+    messageEl.innerHTML =
+      randomItem(praiseMessages);
+
+    messageEl.className =
+      "message correct";
+
+  }else{
+
+    playWrongSound();
+
+    messageEl.innerHTML =
+      `${randomItem(encourageMessages)}
+      <br>
+      🌸 Đáp án là ${current.name}`;
+
+    messageEl.className =
+      "message wrong";
+
+  }
+
+  if(question === 6){
+
+    currentLevel = 1;
+
+  }else if(question === 11){
+
+    currentLevel = 2;
+
+  }else if(question === 16){
+
+    currentLevel = 3;
+
+  }
+
+  question++;
+
+  setTimeout(() => {
+
+    nextQuestion();
+
+  },1600);
+
+}
+
+function endGame(){
+
+  clearInterval(timer);
+
+  choicesEl.innerHTML = "";
+  choicesEl.style.display = "none";
+
+  const startArea = document.getElementById("startArea");
+  if(startArea){
+    startArea.style.display = "none";
+  }
+
+  restartBtn.style.display = "block";
+
+  document.getElementById("timerBox").innerHTML = "🏁 Hoàn thành!";
+  document.getElementById("timerValue").innerText = "✓";
+
+  if(score === 20){
+
+    playClapSound();
+
+    messageEl.innerHTML =
+      `👏👏👏<br>20/20 PERFECT!<br>🏆 SIÊU XUẤT SẮC!`;
+
+  }else{
+
+    messageEl.innerHTML =
+      `🎹 Bé được ${score}/20 điểm!
+      <br>
+      🌈 Chơi rất tốt!`;
+
+  }
+
+  messageEl.className =
+    "message correct";
+
+}
+
+restartBtn.onclick = () => {
+
+  clearInterval(timer);
+
+  score = 0;
+  question = 1;
+  currentLevel = 0;
+
+  scoreEl.innerText = score;
+
+  restartBtn.style.display = "none";
+  gameStarted = false;
+  startGame();
+
+};
+
+function startGame(){
+
+  if(gameStarted) return;
+  gameStarted = true;
+
+  document.getElementById("message").innerHTML = "";
+
+  const startArea = document.getElementById("startArea");
+  if(startArea){
+    startArea.style.display = "none";
+  }
+
+  initAudio();
+  nextQuestion();
+}
+
+choicesEl.innerHTML = `
+<button
+id="startGameBtn"
+class="start-btn">
+▶ START GAME
+</button>
+`;
+
+document
+.getElementById("startGameBtn")
+.onclick = startGame;
+
+</script>
+
+</body>
+</html>
